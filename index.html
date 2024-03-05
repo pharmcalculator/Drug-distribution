@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scientific Figure</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        canvas {
+            display: block;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>How to Generate a Figure:</h2>
+        <p>1. Enter the number of data sets.</p>
+        <p>2. Click "Create Data Fields" to generate input fields for each data set.</p>
+        <p>3. Enter the X variable and mean Y value for each data set.</p>
+        <p>4. Click "Generate Graph" to generate the figure.</p>
+        <label for="data-count">Number of Data Sets:</label>
+        <input type="number" id="data-count" min="1" value="1">
+        <button onclick="createDataFields()">Create Data Fields</button>
+    </div>
+    <div id="data-input"></div>
+    <button onclick="generateGraph()">Generate Graph</button>
+    <canvas id="figure" width="800" height="400"></canvas>
+
+    <script>
+        function createDataFields() {
+            var dataCountInput = document.getElementById('data-count');
+            var dataCount = parseInt(dataCountInput.value);
+
+            if (isNaN(dataCount) || dataCount < 1) {
+                alert('Please enter a valid number of data sets.');
+                return;
+            }
+
+            var dataInputDiv = document.getElementById('data-input');
+            dataInputDiv.innerHTML = '';
+
+            for (var i = 0; i < dataCount; i++) {
+                var dataFieldset = document.createElement('fieldset');
+                var legend = document.createElement('legend');
+                legend.textContent = 'Data Set ' + (i + 1);
+                dataFieldset.appendChild(legend);
+
+                var xLabel = document.createElement('label');
+                xLabel.textContent = 'X Variable:';
+                var xInput = document.createElement('input');
+                xInput.type = 'text';
+                xInput.classList.add('x-input');
+                dataFieldset.appendChild(xLabel);
+                dataFieldset.appendChild(xInput);
+
+                var yLabel = document.createElement('label');
+                yLabel.textContent = 'Mean Y Value:';
+                var yInput = document.createElement('input');
+                yInput.type = 'number';
+                yInput.classList.add('y-input');
+                dataFieldset.appendChild(yLabel);
+                dataFieldset.appendChild(yInput);
+
+                dataInputDiv.appendChild(dataFieldset);
+            }
+        }
+
+        function generateGraph() {
+            var xInputs = document.getElementsByClassName('x-input');
+            var yInputs = document.getElementsByClassName('y-input');
+
+            var dataSets = [];
+
+            for (var i = 0; i < xInputs.length; i++) {
+                var xValue = xInputs[i].value.trim();
+                var yValue = parseFloat(yInputs[i].value);
+
+                if (xValue === '' || isNaN(yValue)) {
+                    alert('Please enter valid values for all data sets.');
+                    return;
+                }
+
+                dataSets.push({ x: xValue, y: yValue });
+            }
+
+            var ctx = document.getElementById('figure').getContext('2d');
+
+            var labels = dataSets.map(data => data.x);
+            var yData = dataSets.map(data => data.y);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Mean Y',
+                        data: yData,
+                        backgroundColor: 'blue'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'category',
+                            position: 'bottom'
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
